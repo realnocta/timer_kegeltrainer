@@ -132,6 +132,11 @@
       timer = setInterval(() => {
         const seconds = Math.floor((Date.now() - startTime) / 1000);
         secondsDisplay.textContent = seconds;
+
+        // Cambia sfondo a verde dopo 10 secondi
+        if (seconds >= 10) {
+          body.style.backgroundColor = '#6aa84f';
+        }
       }, 200);
     }
 
@@ -146,6 +151,10 @@
       postTimer = setInterval(() => {
         const seconds = Math.floor((Date.now() - postStartTime) / 1000);
         postSecondsDisplay.textContent = seconds;
+
+        if (seconds >= 5) {
+          body.style.backgroundColor = '#e74c3c'; // colore rosso personalizzato
+        }
       }, 200);
     }
 
@@ -156,17 +165,18 @@
       postSecondsDisplay.textContent = "0";
       touchCount = 0;
       touchCountDisplay.textContent = "0";
+      body.style.backgroundColor = '#0A0A0A';
     }
 
     function handlePressStart(e) {
       e.preventDefault();
-      body.style.backgroundColor = '#190F2E';
+      body.style.backgroundColor = '#190F2E'; // viola
       startCount();
     }
 
     function handlePressEnd(e) {
       e.preventDefault();
-      body.style.backgroundColor = '#0A0A0A';
+      body.style.backgroundColor = '#0A0A0A'; // torna al colore base
       stopCount();
     }
 
