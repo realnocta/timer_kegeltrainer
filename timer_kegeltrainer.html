@@ -1,0 +1,140 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Touch & Count</title>
+  <style>
+    body {
+      font-family: sans-serif;
+      background-color: #0A0A0A;
+      color: #FFFFFF;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      height: 100vh;
+      margin: 0;
+      transition: background-color 0.2s;
+    }
+    #square {
+      width: 200px;
+      height: 200px;
+      background-color: #3498db; /* azzurro fisso */
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: white;
+      font-size: 24px;
+      border-radius: 10px;
+      user-select: none;
+      touch-action: manipulation;
+    }
+    .info {
+      font-size: 20px;
+    }
+    .info-row {
+      display: flex;
+      gap: 40px;
+      margin-top: 20px;
+      font-size: 20px;
+    }
+    .info-total {
+      margin-top: 20px;
+      font-size: 20px;
+    }
+    button {
+      margin-top: 30px;
+      padding: 10px 20px;
+      font-size: 16px;
+      border: none;
+      border-radius: 8px;
+      background-color: #e74c3c;
+      color: white;
+      cursor: pointer;
+    }
+    button:hover {
+      background-color: #c0392b;
+    }
+  </style>
+</head>
+<body>
+
+  <div id="square">Click</div>
+
+  <div class="info-row">
+    <div class="info">Tempo: <span id="seconds">0</span> s</div>
+    <div class="info">Post-touch: <span id="postSeconds">0</span> s</div>
+  </div>
+
+  <div class="info-total">Tocchi totali: <span id="touchCount">0</span></div>
+
+  <button onclick="resetAll()">Reset</button>
+
+  <script>
+    const square = document.getElementById('square');
+    const secondsDisplay = document.getElementById('seconds');
+    const postSecondsDisplay = document.getElementById('postSeconds');
+    const touchCountDisplay = document.getElementById('touchCount');
+    const body = document.body;
+
+    let touchCount = 0;
+    let startTime = 0;
+    let timer;
+    let postStartTime = 0;
+    let postTimer;
+
+    function startCount() {
+      clearInterval(postTimer);
+      postSecondsDisplay.textContent = "0";
+      startTime = Date.now();
+      timer = setInterval(() => {
+        const seconds = Math.floor((Date.now() - startTime) / 1000);
+        secondsDisplay.textContent = seconds;
+      }, 200);
+    }
+
+    function stopCount() {
+      clearInterval(timer);
+      const seconds = Math.floor((Date.now() - startTime) / 1000);
+      secondsDisplay.textContent = seconds;
+      touchCount++;
+      touchCountDisplay.textContent = touchCount;
+
+      postStartTime = Date.now();
+      postTimer = setInterval(() => {
+        const seconds = Math.floor((Date.now() - postStartTime) / 1000);
+        postSecondsDisplay.textContent = seconds;
+      }, 200);
+    }
+
+    function resetAll() {
+      clearInterval(timer);
+      clearInterval(postTimer);
+      secondsDisplay.textContent = "0";
+      postSecondsDisplay.textContent = "0";
+      touchCount = 0;
+      touchCountDisplay.textContent = "0";
+    }
+
+    // Eventi per cambio sfondo su pressione
+    function handlePressStart(e) {
+      e.preventDefault();
+      body.style.backgroundColor = '#e74c3c'; // rosso
+      startCount();
+    }
+
+    function handlePressEnd(e) {
+      e.preventDefault();
+      body.style.backgroundColor = '#0A0A0A'; // torna nero
+      stopCount();
+    }
+
+    square.addEventListener('mousedown', handlePressStart);
+    square.addEventListener('mouseup', handlePressEnd);
+    square.addEventListener('touchstart', handlePressStart);
+    square.addEventListener('touchend', handlePressEnd);
+  </script>
+
+</body>
+</html>
