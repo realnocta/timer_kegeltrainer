@@ -17,6 +17,13 @@
       margin: 0;
       transition: background-color 0.2s;
     }
+
+    h1 {
+      font-size: 32px;
+      margin-bottom: 30px;
+      text-align: center;
+    }
+
     #square {
       width: 200px;
       height: 200px;
@@ -30,19 +37,23 @@
       user-select: none;
       touch-action: manipulation;
     }
+
     .info {
       font-size: 20px;
     }
+
     .info-row {
       display: flex;
       gap: 40px;
       margin-top: 20px;
       font-size: 20px;
     }
+
     .info-total {
       margin-top: 20px;
       font-size: 20px;
     }
+
     button {
       margin-top: 30px;
       padding: 10px 20px;
@@ -53,12 +64,15 @@
       color: white;
       cursor: pointer;
     }
+
     button:hover {
       background-color: #c0392b;
     }
   </style>
 </head>
 <body>
+
+  <h1>Kegel Timer Trainer</h1>
 
   <div id="square">Click</div>
 
@@ -117,7 +131,6 @@
       touchCountDisplay.textContent = "0";
     }
 
-    // Eventi per cambio sfondo su pressione
     function handlePressStart(e) {
       e.preventDefault();
       body.style.backgroundColor = '#e74c3c'; // rosso
