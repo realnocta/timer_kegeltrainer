@@ -15,11 +15,8 @@
       justify-content: center;
       height: 100vh;
       margin: 0;
-      transition: background-color 0.2s, background-image 0.2s;
+      transition: background-color 0.2s;
       position: relative;
-      background-size: cover;
-      background-repeat: no-repeat;
-      background-position: center;
     }
 
     h1 {
@@ -154,20 +151,17 @@
       postSecondsDisplay.textContent = "0";
       touchCount = 0;
       touchCountDisplay.textContent = "0";
-      body.style.backgroundImage = "none";
-      body.style.backgroundColor = "#0A0A0A";
     }
 
     function handlePressStart(e) {
       e.preventDefault();
-      body.style.backgroundImage = "url('https://media3.giphy.com/media/v1.Y2lkPTc5MGI3NjExYWRuanJpc2c1eTBwbm9lMjIzcmI3Z3liNGsyZ211MWtkYWt2amJ6ZyZlcD12MV9pbnRlcm5hbF9naWZfYnlfaWQmY3Q9Zw/V7bipYDaZD4R2/giphy.gif')";
+      body.style.backgroundColor = '#190F2E';
       startCount();
     }
 
     function handlePressEnd(e) {
       e.preventDefault();
-      body.style.backgroundImage = "none";
-      body.style.backgroundColor = "#0A0A0A";
+      body.style.backgroundColor = '#0A0A0A';
       stopCount();
     }
 
