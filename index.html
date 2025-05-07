@@ -19,9 +19,15 @@
       position: relative;
     }
 
+    .container {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 30px;
+    }
+
     h1 {
       font-size: 32px;
-      margin-bottom: 30px;
       text-align: center;
     }
 
@@ -51,18 +57,15 @@
 
     .info-row {
       display: flex;
-      gap: 40px;
-      margin-top: 20px;
+      gap: 50px;
       font-size: 20px;
     }
 
     .info-total {
-      margin-top: 20px;
       font-size: 20px;
     }
 
     button {
-      margin-top: 30px;
       padding: 10px 20px;
       font-size: 16px;
       border: none;
@@ -91,18 +94,20 @@
 </head>
 <body>
 
-  <h1>Kegel Timer Trainer</h1>
+  <div class="container">
+    <h1>Kegel Timer Trainer</h1>
 
-  <div id="square">Click</div>
+    <div id="square">Click</div>
 
-  <div class="info-row">
-    <div class="info">Time: <span id="seconds">0</span> s</div>
-    <div class="info">Post-touch: <span id="postSeconds">0</span> s</div>
+    <div class="info-row">
+      <div class="info">Time: <span id="seconds">0</span> s</div>
+      <div class="info">Post-touch: <span id="postSeconds">0</span> s</div>
+    </div>
+
+    <div class="info-total">Rep: <span id="touchCount">0</span></div>
+
+    <button onclick="resetAll()">Reset</button>
   </div>
-
-  <div class="info-total">Rep: <span id="touchCount">0</span></div>
-
-  <button onclick="resetAll()">Reset</button>
 
   <div id="clock"></div>
 
