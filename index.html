@@ -90,6 +90,13 @@
       font-size: 14px;
       color: #aaa;
     }
+
+    #congratsMessage {
+      display: none;
+      font-size: 24px;
+      color: #FFD700;
+      font-weight: bold;
+    }
   </style>
 </head>
 <body>
@@ -104,7 +111,11 @@
       <div class="info">Post-touch: <span id="postSeconds">0</span> s</div>
     </div>
 
-    <div class="info-total">Rep: <span id="touchCount">0</span></div>
+    <div class="info-total">
+      Rep: <span id="touchCount">0</span> &nbsp;&nbsp;&nbsp; To Go: <span id="toGo">- 25</span>
+    </div>
+
+    <div id="congratsMessage">Congratulations! 🎉</div>
 
     <button onclick="resetAll()">Reset</button>
   </div>
@@ -116,6 +127,8 @@
     const secondsDisplay = document.getElementById('seconds');
     const postSecondsDisplay = document.getElementById('postSeconds');
     const touchCountDisplay = document.getElementById('touchCount');
+    const toGoDisplay = document.getElementById('toGo');
+    const congratsMessage = document.getElementById('congratsMessage');
     const body = document.body;
     const clock = document.getElementById('clock');
 
@@ -133,7 +146,6 @@
         const seconds = Math.floor((Date.now() - startTime) / 1000);
         secondsDisplay.textContent = seconds;
 
-        // Cambia sfondo a verde dopo 10 secondi
         if (seconds >= 10) {
           body.style.backgroundColor = '#6aa84f';
         }
@@ -144,8 +156,16 @@
       clearInterval(timer);
       const seconds = Math.floor((Date.now() - startTime) / 1000);
       secondsDisplay.textContent = seconds;
+
       touchCount++;
       touchCountDisplay.textContent = touchCount;
+
+      const toGo = Math.max(25 - touchCount, 0);
+      toGoDisplay.textContent = `- ${toGo}`;
+
+      if (touchCount >= 25 && toGo === 0) {
+        congratsMessage.style.display = 'block';
+      }
 
       postStartTime = Date.now();
       postTimer = setInterval(() => {
@@ -153,7 +173,7 @@
         postSecondsDisplay.textContent = seconds;
 
         if (seconds >= 5) {
-          body.style.backgroundColor = '#e74c3c'; // colore rosso personalizzato
+          body.style.backgroundColor = '#e74c3c';
         }
       }, 200);
     }
@@ -165,18 +185,20 @@
       postSecondsDisplay.textContent = "0";
       touchCount = 0;
       touchCountDisplay.textContent = "0";
+      toGoDisplay.textContent = "- 25";
       body.style.backgroundColor = '#0A0A0A';
+      congratsMessage.style.display = 'none';
     }
 
     function handlePressStart(e) {
       e.preventDefault();
-      body.style.backgroundColor = '#190F2E'; // viola
+      body.style.backgroundColor = '#190F2E';
       startCount();
     }
 
     function handlePressEnd(e) {
       e.preventDefault();
-      body.style.backgroundColor = '#0A0A0A'; // torna al colore base
+      body.style.backgroundColor = '#0A0A0A';
       stopCount();
     }
 
