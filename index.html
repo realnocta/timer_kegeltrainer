@@ -7,8 +7,7 @@
   <style>
     body {
       font-family: sans-serif;
-      background: url('belenrodriguez.gif') no-repeat center center fixed;
-      background-size: cover;
+      background-color: #0A0A0A;
       color: #FFFFFF;
       display: flex;
       flex-direction: column;
@@ -18,16 +17,6 @@
       margin: 0;
       transition: background-color 0.2s;
       position: relative;
-    }
-
-    .overlay {
-      position: fixed;
-      top: 0;
-      left: 0;
-      right: 0;
-      bottom: 0;
-      background-color: rgba(0, 0, 0, 0.5); /* oscuramento leggibile */
-      z-index: -1;
     }
 
     .container {
@@ -105,8 +94,6 @@
 </head>
 <body>
 
-  <div class="overlay"></div>
-
   <div class="container">
     <h1>Kegel Timer Trainer</h1>
 
@@ -173,13 +160,13 @@
 
     function handlePressStart(e) {
       e.preventDefault();
-      body.style.backgroundColor = '#190F2E'; // momentaneo per feedback visivo
+      body.style.backgroundColor = '#190F2E';
       startCount();
     }
 
     function handlePressEnd(e) {
       e.preventDefault();
-      body.style.backgroundColor = ''; // ripristina GIF
+      body.style.backgroundColor = '#0A0A0A';
       stopCount();
     }
 
