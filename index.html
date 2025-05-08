@@ -134,12 +134,15 @@
 
     let touchCount = 0;
     let startTime = 0;
-    let timer;
+    let timer = null;
     let postStartTime = 0;
-    let postTimer;
+    let postTimer = null;
 
     function startCount() {
-      clearInterval(postTimer);
+      if (postTimer) {
+        clearInterval(postTimer);
+        postTimer = null;
+      }
       postSecondsDisplay.textContent = "0";
       startTime = Date.now();
       timer = setInterval(() => {
@@ -153,7 +156,10 @@
     }
 
     function stopCount() {
-      clearInterval(timer);
+      if (timer) {
+        clearInterval(timer);
+        timer = null;
+      }
       const seconds = Math.floor((Date.now() - startTime) / 1000);
       secondsDisplay.textContent = seconds;
 
@@ -179,8 +185,14 @@
     }
 
     function resetAll() {
-      clearInterval(timer);
-      clearInterval(postTimer);
+      if (timer) {
+        clearInterval(timer);
+        timer = null;
+      }
+      if (postTimer) {
+        clearInterval(postTimer);
+        postTimer = null;
+      }
       secondsDisplay.textContent = "0";
       postSecondsDisplay.textContent = "0";
       touchCount = 0;
