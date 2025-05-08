@@ -1,9 +1,10 @@
 <!DOCTYPE html>
 <html lang="it">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>Kegel Timer Trainer</title>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
   <style>
     body {
       font-family: sans-serif;
@@ -12,18 +13,21 @@
       display: flex;
       flex-direction: column;
       align-items: center;
-      justify-content: center;
-      height: 100vh;
+      justify-content: flex-start;
+      min-height: 100vh;
       margin: 0;
       transition: background-color 0.2s;
-      position: relative;
+      padding-bottom: 60px;
     }
 
     .container {
       display: flex;
       flex-direction: column;
       align-items: center;
-      gap: 30px;
+      gap: 20px;
+      max-width: 700px;
+      width: 100%;
+      padding: 20px;
     }
 
     h1 {
@@ -51,17 +55,13 @@
       transform: scale(0.9);
     }
 
-    .info {
+    .info, .info-total {
       font-size: 20px;
     }
 
     .info-row {
       display: flex;
       gap: 50px;
-      font-size: 20px;
-    }
-
-    .info-total {
       font-size: 20px;
     }
 
@@ -84,18 +84,100 @@
       transform: scale(0.95);
     }
 
-    #clock {
-      position: absolute;
-      bottom: 10px;
-      font-size: 14px;
-      color: #aaa;
-    }
-
     #congratsMessage {
       display: none;
       font-size: 24px;
       color: #FFD700;
       font-weight: bold;
+    }
+
+    input[type="number"] {
+      padding: 8px;
+      font-size: 16px;
+      border-radius: 6px;
+      border: none;
+      width: 100px;
+      text-align: center;
+    }
+
+    #logContainer, #chartContainer {
+      width: 100%;
+      background-color: #1a1a1a;
+      padding: 20px;
+      margin-top: 10px;
+      border-radius: 10px;
+      box-shadow: 0 0 10px #00000050;
+    }
+
+    #logContainer ul {
+      list-style-type: none;
+      padding: 0;
+      margin: 0;
+    }
+
+    #logContainer li {
+      margin-bottom: 5px;
+      font-size: 14px;
+    }
+
+    #toggleLog {
+      cursor: pointer;
+      font-size: 18px;
+      margin-top: 10px;
+      user-select: none;
+      display: none;
+    }
+
+    canvas {
+      background-color: #0A0A0A;
+    }
+
+    #footer {
+      position: fixed;
+      bottom: 5px;
+      width: 100%;
+      text-align: center;
+      color: #aaa;
+      font-size: 14px;
+    }
+
+    /* Modal styles */
+    .modal {
+      display: none;
+      position: fixed;
+      z-index: 1000;
+      left: 0;
+      top: 0;
+      width: 100%;
+      height: 100%;
+      overflow: auto;
+      background-color: rgba(0,0,0,0.7);
+    }
+
+    .modal-content {
+      background-color: #1a1a1a;
+      margin: 10% auto;
+      padding: 20px;
+      border-radius: 10px;
+      width: 90%;
+      max-width: 400px;
+      text-align: center;
+    }
+
+    .modal-content img {
+      max-width: 100%;
+      height: auto;
+      border-radius: 8px;
+    }
+
+    .close-btn {
+      margin-top: 15px;
+      background-color: #e74c3c;
+      color: white;
+      padding: 10px 20px;
+      border: none;
+      border-radius: 6px;
+      cursor: pointer;
     }
   </style>
 </head>
@@ -103,6 +185,11 @@
 
   <div class="container">
     <h1>Kegel Timer Trainer</h1>
+
+    <div>
+      <label for="repInput">Target Reps:</label>
+      <input type="number" id="repInput" min="1" value="25">
+    </div>
 
     <div id="square">Click</div>
 
@@ -117,10 +204,30 @@
 
     <div id="congratsMessage">Congratulations! 🎉</div>
 
+    <div id="chartContainer" style="display:none;">
+      <canvas id="progressChart"></canvas>
+    </div>
+
+    <div id="toggleLog" onclick="toggleLog()">🔽 Mostra Registro</div>
+
+    <div id="logContainer" style="display:none;">
+      <h3>Registro sessione:</h3>
+      <ul id="logList"></ul>
+    </div>
+
     <button onclick="resetAll()">Reset</button>
   </div>
 
-  <div id="clock"></div>
+  <div id="popupModal" class="modal">
+    <div class="modal-content">
+      <img src="https://your-github-site.github.io/winner1.png" alt="Vittoria!" />
+      <button class="close-btn" onclick="closeModal()">Chiudi</button>
+    </div>
+  </div>
+
+  <footer id="footer">
+    <div id="clock"></div>
+  </footer>
 
   <script>
     const square = document.getElementById('square');
@@ -131,24 +238,36 @@
     const congratsMessage = document.getElementById('congratsMessage');
     const body = document.body;
     const clock = document.getElementById('clock');
+    const repInput = document.getElementById('repInput');
+    const logContainer = document.getElementById('logContainer');
+    const logList = document.getElementById('logList');
+    const chartContainer = document.getElementById('chartContainer');
+    const chartCanvas = document.getElementById('progressChart');
+    const toggleLogBtn = document.getElementById('toggleLog');
+    const popupModal = document.getElementById('popupModal');
 
     let touchCount = 0;
     let startTime = 0;
     let timer = null;
     let postStartTime = 0;
     let postTimer = null;
+    let started = false;
+    let sessionLog = [];
+    let currentRelaxation = 0;
+    let chart;
+    let logVisible = false;
 
     function startCount() {
       if (postTimer) {
         clearInterval(postTimer);
         postTimer = null;
+        currentRelaxation = Math.floor((Date.now() - postStartTime) / 1000);
       }
       postSecondsDisplay.textContent = "0";
       startTime = Date.now();
       timer = setInterval(() => {
         const seconds = Math.floor((Date.now() - startTime) / 1000);
         secondsDisplay.textContent = seconds;
-
         if (seconds >= 10) {
           body.style.backgroundColor = '#6aa84f';
         }
@@ -160,50 +279,70 @@
         clearInterval(timer);
         timer = null;
       }
-      const seconds = Math.floor((Date.now() - startTime) / 1000);
-      secondsDisplay.textContent = seconds;
+
+      const contractionTime = Math.floor((Date.now() - startTime) / 1000);
+      secondsDisplay.textContent = contractionTime;
 
       touchCount++;
       touchCountDisplay.textContent = touchCount;
 
-      const toGo = Math.max(25 - touchCount, 0);
+      const goal = parseInt(repInput.value) || 25;
+      const toGo = Math.max(goal - touchCount, 0);
       toGoDisplay.textContent = `- ${toGo}`;
 
-      if (touchCount >= 25 && toGo === 0) {
+      sessionLog.push({
+        rep: touchCount,
+        contraction: contractionTime,
+        relaxation: currentRelaxation
+      });
+
+      if (touchCount >= goal && toGo === 0) {
         congratsMessage.style.display = 'block';
+        showChart();
+        showLogToggle();
+        showModal();
+        clearInterval(postTimer);
+        postTimer = null;
+        return;
       }
 
       postStartTime = Date.now();
       postTimer = setInterval(() => {
-        const seconds = Math.floor((Date.now() - postStartTime) / 1000);
-        postSecondsDisplay.textContent = seconds;
-
-        if (seconds >= 5) {
+        const relaxTime = Math.floor((Date.now() - postStartTime) / 1000);
+        postSecondsDisplay.textContent = relaxTime;
+        if (relaxTime >= 5 && touchCount < goal) {
           body.style.backgroundColor = '#e74c3c';
         }
       }, 200);
     }
 
     function resetAll() {
-      if (timer) {
-        clearInterval(timer);
-        timer = null;
-      }
-      if (postTimer) {
-        clearInterval(postTimer);
-        postTimer = null;
-      }
+      if (timer) clearInterval(timer);
+      if (postTimer) clearInterval(postTimer);
+      timer = null;
+      postTimer = null;
       secondsDisplay.textContent = "0";
       postSecondsDisplay.textContent = "0";
       touchCount = 0;
+      started = false;
+      currentRelaxation = 0;
+      sessionLog = [];
       touchCountDisplay.textContent = "0";
-      toGoDisplay.textContent = "- 25";
-      body.style.backgroundColor = '#0A0A0A';
+      toGoDisplay.textContent = `- ${repInput.value}`;
       congratsMessage.style.display = 'none';
+      body.style.backgroundColor = '#0A0A0A';
+      logList.innerHTML = '';
+      logContainer.style.display = 'none';
+      toggleLogBtn.style.display = 'none';
+      chartContainer.style.display = 'none';
+      if (chart) chart.destroy();
+      logVisible = false;
+      popupModal.style.display = "none";
     }
 
     function handlePressStart(e) {
       e.preventDefault();
+      if (!started) started = true;
       body.style.backgroundColor = '#190F2E';
       startCount();
     }
@@ -214,10 +353,80 @@
       stopCount();
     }
 
+    function showChart() {
+      chartContainer.style.display = 'block';
+      const labels = sessionLog.map(e => `#${e.rep}`);
+      const contractions = sessionLog.map(e => e.contraction);
+      const relaxations = sessionLog.map(e => e.relaxation);
+
+      chart = new Chart(chartCanvas, {
+        type: 'line',
+        data: {
+          labels,
+          datasets: [
+            {
+              label: 'Contrazione (s)',
+              data: contractions,
+              borderColor: 'green',
+              borderWidth: 2,
+              fill: false
+            },
+            {
+              label: 'Rilassamento (s)',
+              data: relaxations,
+              borderColor: 'red',
+              borderWidth: 2,
+              fill: false
+            }
+          ]
+        },
+        options: {
+          responsive: true,
+          scales: {
+            y: { beginAtZero: true }
+          }
+        }
+      });
+    }
+
+    function showLogToggle() {
+      toggleLogBtn.style.display = 'block';
+    }
+
+    function toggleLog() {
+      logVisible = !logVisible;
+      logContainer.style.display = logVisible ? 'block' : 'none';
+      toggleLogBtn.textContent = logVisible ? '🔼 Nascondi Registro' : '🔽 Mostra Registro';
+
+      if (logVisible) {
+        logList.innerHTML = '';
+        sessionLog.forEach(entry => {
+          const li = document.createElement('li');
+          li.textContent = `Rep ${entry.rep}: Contrazione ${entry.contraction}s, Rilassamento ${entry.relaxation}s`;
+          logList.appendChild(li);
+        });
+      }
+    }
+
+    function showModal() {
+      popupModal.style.display = "block";
+    }
+
+    function closeModal() {
+      popupModal.style.display = "none";
+    }
+
     square.addEventListener('mousedown', handlePressStart);
     square.addEventListener('mouseup', handlePressEnd);
     square.addEventListener('touchstart', handlePressStart);
     square.addEventListener('touchend', handlePressEnd);
+
+    repInput.addEventListener('change', () => {
+      const val = parseInt(repInput.value);
+      if (!isNaN(val) && val > 0) {
+        toGoDisplay.textContent = `- ${val - touchCount}`;
+      }
+    });
 
     function updateClock() {
       const now = new Date();
@@ -232,6 +441,7 @@
 
     setInterval(updateClock, 1000);
     updateClock();
+    toGoDisplay.textContent = `- ${repInput.value}`;
   </script>
 
 </body>
