@@ -6,19 +6,20 @@
   <title>Kegel Timer Trainer</title>
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
   <style>
-    body {
-      font-family: "Helvetica Neue", Arial, sans-serif;
-      background-color: #0A0A0A;
-      color: #FFFFFF;
-      margin: 0;
-      padding: 20px;
-      box-sizing: border-box;
-      display: flex;
-      flex-direction: column;
-      min-height: 100vh;
-      font-size: 1.1rem;
-      font-weight: bold;
-    }
+body {
+  font-family: "Helvetica Neue", Arial, sans-serif;
+  background-color: #0A0A0A;
+  color: #FFFFFF;
+  margin: 0;
+  padding: 20px;
+  box-sizing: border-box;
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+  font-size: 1.1rem;
+  font-weight: bold;
+  transition: background-color 0.5s ease;
+}
 
     #backgroundEffect {
       position: fixed;
@@ -334,16 +335,12 @@ function startCount() {
   postSecondsDisplay.textContent = "0";
   startTime = Date.now();
 
-  // Imposta subito lo sfondo viola scuro
-  document.body.style.backgroundColor = '#6942A3';
-
   timer = setInterval(() => {
     const seconds = Math.floor((Date.now() - startTime) / 1000);
     secondsDisplay.textContent = seconds;
 
-    // Dopo 10 secondi, cambia in verde
     if (seconds >= 10) {
-      document.body.style.backgroundColor = '#6aa84f';
+      document.body.style.backgroundColor = '#6aa84f'; // Verde
     }
   }, 200);
 }
@@ -421,7 +418,7 @@ function startCount() {
       currentGifIndex = (currentGifIndex + 1) % gifUrls.length;
       backgroundEffect.style.backgroundImage = `url('${gifUrls[currentGifIndex]}')`;
 
-      document.body.style.backgroundColor = '#190F2E';
+      document.body.style.backgroundColor = '#6942A3';
       backgroundEffect.style.opacity = '1';
       startCount();
     }
