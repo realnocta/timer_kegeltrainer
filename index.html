@@ -12,22 +12,18 @@
       color: #FFFFFF;
       display: flex;
       flex-direction: column;
+      justify-content: center;
       align-items: center;
-      justify-content: flex-start;
       min-height: 100vh;
       margin: 0;
-      transition: background-color 0.2s;
-      padding-bottom: 60px;
+      position: relative;
+      padding: 0 20px 60px 20px;
     }
 
     .container {
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      gap: 20px;
-      max-width: 700px;
+      text-align: center;
       width: 100%;
-      padding: 20px;
+      max-width: 700px;
     }
 
     h1 {
@@ -49,6 +45,7 @@
       user-select: none;
       touch-action: manipulation;
       transition: transform 0.1s ease;
+      margin: 0 auto;
     }
 
     #square:active {
@@ -61,8 +58,10 @@
 
     .info-row {
       display: flex;
+      justify-content: center;
       gap: 50px;
       font-size: 20px;
+      margin-top: 10px;
     }
 
     button {
@@ -74,6 +73,7 @@
       color: #FFFFFF;
       cursor: pointer;
       transition: transform 0.1s ease;
+      margin-top: 15px;
     }
 
     button:hover {
@@ -89,6 +89,7 @@
       font-size: 24px;
       color: #FFD700;
       font-weight: bold;
+      margin-top: 20px;
     }
 
     input[type="number"] {
@@ -98,6 +99,7 @@
       border: none;
       width: 100px;
       text-align: center;
+      margin-left: 10px;
     }
 
     #logContainer, #chartContainer {
@@ -167,6 +169,8 @@
       max-width: 100%;
       height: auto;
       border-radius: 8px;
+      display: block;
+      margin: 0 auto;
       opacity: 0;
       animation: zoomIn 0.6s ease forwards;
     }
@@ -232,7 +236,7 @@
 
   <div id="popupModal" class="modal">
     <div class="modal-content">
-      <img src="winner1.png" alt="Winner" />
+      <img id="winnerImage" src="winner1.png" alt="Winner" />
       <p style="font-size: 24px; color: #FFD700; font-weight: bold; margin-top: 15px;">Congratulations! 🎉</p>
       <button class="close-btn" onclick="closeModal()">Close</button>
     </div>
@@ -421,6 +425,9 @@
     }
 
     function showModal() {
+      const imageOptions = ['winner1.png', 'winner2.png', 'winner3.png', 'winner4.png', 'winner5.png'];
+      const randomImage = imageOptions[Math.floor(Math.random() * imageOptions.length)];
+      document.getElementById('winnerImage').src = randomImage;
       popupModal.style.display = "block";
     }
 
