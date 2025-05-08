@@ -7,7 +7,7 @@
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
   <style>
     body {
-      font-family: sans-serif;
+      font-family: "Helvetica Neue", Arial, sans-serif;
       background-color: #0A0A0A;
       color: #FFFFFF;
       margin: 0;
@@ -16,6 +16,29 @@
       display: flex;
       flex-direction: column;
       min-height: 100vh;
+      font-size: 1.1rem;
+      font-weight: bold;
+    }
+
+    #backgroundEffect {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background-size: cover;
+      background-position: center;
+      z-index: -1;
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.3s ease;
+    }
+
+    #backgroundEffect::before {
+      content: "";
+      position: absolute;
+      inset: 0;
+      background-color: rgba(75, 0, 130, 0.6); /* Viola trasparente */
     }
 
     .container {
@@ -214,6 +237,8 @@
 </head>
 <body>
 
+  <div id="backgroundEffect"></div>
+
   <div class="container">
     <h1>Kegel Timer Trainer</h1>
 
@@ -276,6 +301,7 @@
     const toggleLogBtn = document.getElementById('toggleLog');
     const popupModal = document.getElementById('popupModal');
     const clock = document.getElementById('clock');
+    const backgroundEffect = document.getElementById('backgroundEffect');
 
     let touchCount = 0;
     let startTime = 0;
@@ -287,6 +313,14 @@
     let currentRelaxation = 0;
     let chart;
     let logVisible = false;
+
+    const gifUrls = [
+      'https://media2.giphy.com/media/v1.Y2lkPTc5MGI3NjExdzFyenA2dzY1aXI0NjM3ZGJ5bXlmcnZpNmNrMHY5MWFpbW41cmFjMSZlcD12MV9pbnRlcm5hbF9naWZfYnlfaWQmY3Q9Zw/svbEXm7eGdYhEPITfT/giphy.gif',
+      'https://media0.giphy.com/media/v1.Y2lkPTc5MGI3NjExcHRlZjZsMTFqb3ZhN21rOW83dms4ZDdrb3N1NTY3aG1nY2IycXluMyZlcD12MV9pbnRlcm5hbF9naWZfYnlfaWQmY3Q9Zw/UhE1jItlh4DHPOX4vk/giphy.gif',
+      'https://media2.giphy.com/media/v1.Y2lkPTc5MGI3NjExdzNxNjRtamM2bWk2NngxeHEwNDJja2F6dDdsanV4NnY0ankzeG9taCZlcD12MV9pbnRlcm5hbF9naWZfYnlfaWQmY3Q9Zw/8eAgATN6HZoiifUJyh/giphy.gif',
+      'https://media4.giphy.com/media/jTo1LpDVjZZrCFKXv4/giphy.gif'
+    ];
+    let currentGifIndex = 0;
 
     function startCount() {
       if (postTimer) {
@@ -374,13 +408,19 @@
     function handlePressStart(e) {
       e.preventDefault();
       if (!started) started = true;
+
+      currentGifIndex = (currentGifIndex + 1) % gifUrls.length;
+      backgroundEffect.style.backgroundImage = `url('${gifUrls[currentGifIndex]}')`;
+
       document.body.style.backgroundColor = '#190F2E';
+      backgroundEffect.style.opacity = '1';
       startCount();
     }
 
     function handlePressEnd(e) {
       e.preventDefault();
       document.body.style.backgroundColor = '#0A0A0A';
+      backgroundEffect.style.opacity = '0';
       stopCount();
     }
 
