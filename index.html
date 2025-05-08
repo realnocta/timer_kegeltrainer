@@ -18,7 +18,6 @@
       min-height: 100vh;
       font-size: 1.1rem;
       font-weight: bold;
-      transition: background-color 0.5s ease;
     }
 
     #backgroundEffect {
@@ -39,18 +38,39 @@
       content: "";
       position: absolute;
       inset: 0;
-      background-color: rgba(75, 0, 130, 0.6);
+      background-color: rgba(75, 0, 130, 0.6); /* Viola trasparente */
     }
 
     .container {
       text-align: center;
+      width: 100%;
       max-width: 400px;
-      margin: auto;
       display: flex;
       flex-direction: column;
-      gap: 25px;
+      align-items: center;
       justify-content: center;
+      gap: 25px;
       min-height: 60vh;
+      margin: auto;
+    }
+
+    h1 {
+      font-size: 2rem;
+      margin: 0;
+    }
+
+    label {
+      font-size: 1.1rem;
+    }
+
+    #repInput {
+      padding: 10px;
+      font-size: 1.1rem;
+      border-radius: 6px;
+      border: none;
+      width: 80px;
+      text-align: center;
+      margin-left: 10px;
     }
 
     #square {
@@ -60,16 +80,37 @@
       display: flex;
       align-items: center;
       justify-content: center;
+      color: #000000;
       font-size: 1.3rem;
-      color: #000;
       font-weight: bold;
       border-radius: 10px;
       user-select: none;
+      touch-action: manipulation;
       transition: transform 0.1s ease;
     }
 
     #square:active {
       transform: scale(0.9);
+    }
+
+    .info-row {
+      display: flex;
+      justify-content: center;
+      gap: 20px;
+      font-size: 1rem;
+      flex-wrap: wrap;
+    }
+
+    .info-total {
+      font-size: 1.1rem;
+      margin-top: 5px;
+    }
+
+    #congratsMessage {
+      display: none;
+      font-size: 1.4rem;
+      color: #FFD700;
+      font-weight: bold;
     }
 
     button {
@@ -78,7 +119,7 @@
       border: none;
       border-radius: 8px;
       background-color: #e74c3c;
-      color: #fff;
+      color: #FFFFFF;
       cursor: pointer;
       transition: transform 0.1s ease;
     }
@@ -91,24 +132,9 @@
       transform: scale(0.95);
     }
 
-    .info-row {
-      display: flex;
-      justify-content: center;
-      gap: 20px;
-      flex-wrap: wrap;
-    }
-
-    .info-total, #congratsMessage {
-      font-size: 1.2rem;
-    }
-
-    #congratsMessage {
-      color: #FFD700;
-      display: none;
-    }
-
     #chartContainer, #logContainer {
-      background: #1a1a1a;
+      width: 100%;
+      background-color: #1a1a1a;
       padding: 15px;
       border-radius: 10px;
       margin-top: 20px;
@@ -117,6 +143,7 @@
     #logContainer ul {
       list-style: none;
       padding: 0;
+      margin: 0;
     }
 
     #logContainer li {
@@ -125,9 +152,15 @@
     }
 
     #toggleLog {
-      display: none;
       cursor: pointer;
       font-size: 1.1rem;
+      margin-top: 10px;
+      user-select: none;
+      display: none;
+    }
+
+    canvas {
+      background-color: #0A0A0A;
     }
 
     #footer {
@@ -137,7 +170,64 @@
       padding: 10px 0;
     }
 
+    .modal {
+      display: none;
+      position: fixed;
+      z-index: 1000;
+      left: 0;
+      top: 0;
+      width: 100%;
+      height: 100%;
+      background-color: rgba(0,0,0,0.7);
+    }
+
+    .modal-content {
+      background-color: #1a1a1a;
+      margin: 10% auto;
+      padding: 20px;
+      border-radius: 10px;
+      width: 90%;
+      max-width: 400px;
+      text-align: center;
+      animation: zoomIn 0.6s ease forwards;
+    }
+
+    .modal-content img {
+      max-width: 100%;
+      height: auto;
+      border-radius: 8px;
+      display: block;
+      margin: 0 auto;
+      opacity: 0;
+      animation: zoomIn 0.6s ease forwards;
+    }
+
+    .close-btn {
+      margin-top: 20px;
+      background-color: #e74c3c;
+      color: white;
+      padding: 10px 20px;
+      border: none;
+      border-radius: 6px;
+      cursor: pointer;
+    }
+
+    @keyframes zoomIn {
+      from {
+        opacity: 0;
+        transform: scale(0.8);
+      }
+      to {
+        opacity: 1;
+        transform: scale(1);
+      }
+    }
+
     @media (max-width: 480px) {
+      .container {
+        gap: 20px;
+      }
+
       #square {
         width: 160px;
         height: 160px;
@@ -160,8 +250,8 @@
     <div id="square">Press</div>
 
     <div class="info-row">
-      <div>Hold Time: <span id="seconds">0</span> s</div>
-      <div>Rest Time: <span id="postSeconds">0</span> s</div>
+      <div class="info">Hold Time: <span id="seconds">0</span> s</div>
+      <div class="info">Rest Time: <span id="postSeconds">0</span> s</div>
     </div>
 
     <div class="info-total">
@@ -184,6 +274,14 @@
     <button onclick="resetAll()">Reset</button>
   </div>
 
+  <div id="popupModal" class="modal">
+    <div class="modal-content">
+      <img id="winnerImage" src="winner1.png" alt="Winner" />
+      <p style="font-size: 24px; color: #FFD700; font-weight: bold; margin-top: 15px;">Congratulations! 🎉</p>
+      <button class="close-btn" onclick="closeModal()">Close</button>
+    </div>
+  </div>
+
   <footer id="footer">
     <div id="clock"></div>
   </footer>
@@ -196,12 +294,14 @@
     const toGoDisplay = document.getElementById('toGo');
     const congratsMessage = document.getElementById('congratsMessage');
     const repInput = document.getElementById('repInput');
+    const logContainer = document.getElementById('logContainer');
     const logList = document.getElementById('logList');
-    const chartCanvas = document.getElementById('progressChart');
     const chartContainer = document.getElementById('chartContainer');
+    const chartCanvas = document.getElementById('progressChart');
     const toggleLogBtn = document.getElementById('toggleLog');
-    const backgroundEffect = document.getElementById('backgroundEffect');
+    const popupModal = document.getElementById('popupModal');
     const clock = document.getElementById('clock');
+    const backgroundEffect = document.getElementById('backgroundEffect');
 
     let touchCount = 0;
     let startTime = 0;
@@ -213,16 +313,13 @@
     let currentRelaxation = 0;
     let chart;
     let logVisible = false;
-    let greenTimeout = null;
 
     const gifUrls = [
       'https://media2.giphy.com/media/v1.Y2lkPTc5MGI3NjExdzFyenA2dzY1aXI0NjM3ZGJ5bXlmcnZpNmNrMHY5MWFpbW41cmFjMSZlcD12MV9pbnRlcm5hbF9naWZfYnlfaWQmY3Q9Zw/svbEXm7eGdYhEPITfT/giphy.gif',
       'https://media0.giphy.com/media/v1.Y2lkPTc5MGI3NjExcHRlZjZsMTFqb3ZhN21rOW83dms4ZDdrb3N1NTY3aG1nY2IycXluMyZlcD12MV9pbnRlcm5hbF9naWZfYnlfaWQmY3Q9Zw/UhE1jItlh4DHPOX4vk/giphy.gif',
       'https://media2.giphy.com/media/v1.Y2lkPTc5MGI3NjExdzNxNjRtamM2bWk2NngxeHEwNDJja2F6dDdsanV4NnY0ankzeG9taCZlcD12MV9pbnRlcm5hbF9naWZfYnlfaWQmY3Q9Zw/8eAgATN6HZoiifUJyh/giphy.gif',
-      'https://media4.giphy.com/media/jTo1LpDVjZZrCFKXv4/giphy.gif',
-      'https://s4.gifyu.com/images/bLAAG.gif'
+      'https://media4.giphy.com/media/jTo1LpDVjZZrCFKXv4/giphy.gif'
     ];
-
     let currentGifIndex = 0;
 
     function startCount() {
@@ -231,29 +328,21 @@
         postTimer = null;
         currentRelaxation = Math.floor((Date.now() - postStartTime) / 1000);
       }
-
       postSecondsDisplay.textContent = "0";
       startTime = Date.now();
-
       timer = setInterval(() => {
         const seconds = Math.floor((Date.now() - startTime) / 1000);
         secondsDisplay.textContent = seconds;
+        if (seconds >= 10) {
+          document.body.style.backgroundColor = '#6aa84f';
+        }
       }, 200);
-
-      greenTimeout = setTimeout(() => {
-        document.body.style.backgroundColor = '#6aa84f';
-      }, 10000);
     }
 
     function stopCount() {
       if (timer) {
         clearInterval(timer);
         timer = null;
-      }
-
-      if (greenTimeout) {
-        clearTimeout(greenTimeout);
-        greenTimeout = null;
       }
 
       const contractionTime = Math.floor((Date.now() - startTime) / 1000);
@@ -266,12 +355,19 @@
       const toGo = Math.max(goal - touchCount, 0);
       toGoDisplay.textContent = `- ${toGo}`;
 
-      sessionLog.push({ rep: touchCount, contraction: contractionTime, relaxation: currentRelaxation });
+      sessionLog.push({
+        rep: touchCount,
+        contraction: contractionTime,
+        relaxation: currentRelaxation
+      });
 
       if (touchCount >= goal && toGo === 0) {
         congratsMessage.style.display = 'block';
         showChart();
-        toggleLogBtn.style.display = 'block';
+        showLogToggle();
+        showModal();
+        clearInterval(postTimer);
+        postTimer = null;
         return;
       }
 
@@ -288,21 +384,25 @@
     function resetAll() {
       if (timer) clearInterval(timer);
       if (postTimer) clearInterval(postTimer);
-      if (greenTimeout) clearTimeout(greenTimeout);
       timer = null;
       postTimer = null;
-      greenTimeout = null;
-      touchCount = 0;
-      started = false;
-      sessionLog = [];
       secondsDisplay.textContent = "0";
       postSecondsDisplay.textContent = "0";
+      touchCount = 0;
+      started = false;
+      currentRelaxation = 0;
+      sessionLog = [];
       touchCountDisplay.textContent = "0";
       toGoDisplay.textContent = `- ${repInput.value}`;
-      document.body.style.backgroundColor = '#0A0A0A';
       congratsMessage.style.display = 'none';
-      chartContainer.style.display = 'none';
+      document.body.style.backgroundColor = '#0A0A0A';
+      logList.innerHTML = '';
+      logContainer.style.display = 'none';
       toggleLogBtn.style.display = 'none';
+      chartContainer.style.display = 'none';
+      if (chart) chart.destroy();
+      logVisible = false;
+      popupModal.style.display = "none";
     }
 
     function handlePressStart(e) {
@@ -311,16 +411,16 @@
 
       currentGifIndex = (currentGifIndex + 1) % gifUrls.length;
       backgroundEffect.style.backgroundImage = `url('${gifUrls[currentGifIndex]}')`;
-      backgroundEffect.style.opacity = '1';
 
-      document.body.style.backgroundColor = '#6942A3'; // Viola scuro
+      document.body.style.backgroundColor = '#190F2E';
+      backgroundEffect.style.opacity = '1';
       startCount();
     }
 
     function handlePressEnd(e) {
       e.preventDefault();
-      backgroundEffect.style.opacity = '0';
       document.body.style.backgroundColor = '#0A0A0A';
+      backgroundEffect.style.opacity = '0';
       stopCount();
     }
 
@@ -330,25 +430,43 @@
       const contractions = sessionLog.map(e => e.contraction);
       const relaxations = sessionLog.map(e => e.relaxation);
 
-      new Chart(chartCanvas, {
+      chart = new Chart(chartCanvas, {
         type: 'line',
         data: {
           labels,
           datasets: [
-            { label: 'Hold (s)', data: contractions, borderColor: 'green', borderWidth: 2, fill: false },
-            { label: 'Rest (s)', data: relaxations, borderColor: 'red', borderWidth: 2, fill: false }
+            {
+              label: 'Hold (s)',
+              data: contractions,
+              borderColor: 'green',
+              borderWidth: 2,
+              fill: false
+            },
+            {
+              label: 'Rest (s)',
+              data: relaxations,
+              borderColor: 'red',
+              borderWidth: 2,
+              fill: false
+            }
           ]
         },
         options: {
           responsive: true,
-          scales: { y: { beginAtZero: true } }
+          scales: {
+            y: { beginAtZero: true }
+          }
         }
       });
     }
 
+    function showLogToggle() {
+      toggleLogBtn.style.display = 'block';
+    }
+
     function toggleLog() {
       logVisible = !logVisible;
-      document.getElementById('logContainer').style.display = logVisible ? 'block' : 'none';
+      logContainer.style.display = logVisible ? 'block' : 'none';
       toggleLogBtn.textContent = logVisible ? '🔼 Hide Log' : '🔽 Show Log';
 
       if (logVisible) {
@@ -361,13 +479,26 @@
       }
     }
 
+    function showModal() {
+      const imageOptions = ['winner1.png', 'winner2.png', 'winner3.png', 'winner4.png', 'winner5.png'];
+      const randomImage = imageOptions[Math.floor(Math.random() * imageOptions.length)];
+      document.getElementById('winnerImage').src = randomImage;
+      popupModal.style.display = "block";
+    }
+
+    function closeModal() {
+      popupModal.style.display = "none";
+    }
+
     function updateClock() {
       const now = new Date();
-      const formatted = now.toLocaleString('it-IT', {
-        day: '2-digit', month: '2-digit', year: 'numeric',
-        hour: '2-digit', minute: '2-digit', second: '2-digit'
-      });
-      clock.textContent = formatted;
+      const day = String(now.getDate()).padStart(2, '0');
+      const month = String(now.getMonth() + 1).padStart(2, '0');
+      const year = now.getFullYear();
+      const hours = String(now.getHours()).padStart(2, '0');
+      const minutes = String(now.getMinutes()).padStart(2, '0');
+      const seconds = String(now.getSeconds()).padStart(2, '0');
+      clock.textContent = `${day}/${month}/${year} ${hours}:${minutes}:${seconds}`;
     }
 
     setInterval(updateClock, 1000);
@@ -379,5 +510,6 @@
     square.addEventListener('touchstart', handlePressStart);
     square.addEventListener('touchend', handlePressEnd);
   </script>
+
 </body>
 </html>
