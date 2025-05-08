@@ -324,22 +324,29 @@ const gifUrls = [
 
     let currentGifIndex = 0;
 
-    function startCount() {
-      if (postTimer) {
-        clearInterval(postTimer);
-        postTimer = null;
-        currentRelaxation = Math.floor((Date.now() - postStartTime) / 1000);
-      }
-      postSecondsDisplay.textContent = "0";
-      startTime = Date.now();
-      timer = setInterval(() => {
-        const seconds = Math.floor((Date.now() - startTime) / 1000);
-        secondsDisplay.textContent = seconds;
-        if (seconds >= 10) {
-          document.body.style.backgroundColor = '#6aa84f';
-        }
-      }, 200);
+function startCount() {
+  if (postTimer) {
+    clearInterval(postTimer);
+    postTimer = null;
+    currentRelaxation = Math.floor((Date.now() - postStartTime) / 1000);
+  }
+
+  postSecondsDisplay.textContent = "0";
+  startTime = Date.now();
+
+  // Imposta subito lo sfondo viola scuro
+  document.body.style.backgroundColor = '#6942A3';
+
+  timer = setInterval(() => {
+    const seconds = Math.floor((Date.now() - startTime) / 1000);
+    secondsDisplay.textContent = seconds;
+
+    // Dopo 10 secondi, cambia in verde
+    if (seconds >= 10) {
+      document.body.style.backgroundColor = '#6aa84f';
     }
+  }, 200);
+}
 
     function stopCount() {
       if (timer) {
