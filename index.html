@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="it">
+<html lang="en">
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
@@ -141,7 +141,6 @@
       font-size: 14px;
     }
 
-    /* Modal styles */
     .modal {
       display: none;
       position: fixed;
@@ -150,7 +149,6 @@
       top: 0;
       width: 100%;
       height: 100%;
-      overflow: auto;
       background-color: rgba(0,0,0,0.7);
     }
 
@@ -162,12 +160,26 @@
       width: 90%;
       max-width: 400px;
       text-align: center;
+      animation: zoomIn 0.6s ease forwards;
     }
 
     .modal-content img {
       max-width: 100%;
       height: auto;
       border-radius: 8px;
+      opacity: 0;
+      animation: zoomIn 0.6s ease forwards;
+    }
+
+    @keyframes zoomIn {
+      from {
+        opacity: 0;
+        transform: scale(0.8);
+      }
+      to {
+        opacity: 1;
+        transform: scale(1);
+      }
     }
 
     .close-btn {
@@ -191,15 +203,15 @@
       <input type="number" id="repInput" min="1" value="25">
     </div>
 
-    <div id="square">Click</div>
+    <div id="square">Press</div>
 
     <div class="info-row">
-      <div class="info">Time: <span id="seconds">0</span> s</div>
-      <div class="info">Post-touch: <span id="postSeconds">0</span> s</div>
+      <div class="info">Hold Time: <span id="seconds">0</span> s</div>
+      <div class="info">Rest Time: <span id="postSeconds">0</span> s</div>
     </div>
 
     <div class="info-total">
-      Rep: <span id="touchCount">0</span> &nbsp;&nbsp;&nbsp; To Go: <span id="toGo">- 25</span>
+      Completed: <span id="touchCount">0</span> &nbsp;&nbsp;&nbsp; Remaining: <span id="toGo">- 25</span>
     </div>
 
     <div id="congratsMessage">Congratulations! 🎉</div>
@@ -208,10 +220,10 @@
       <canvas id="progressChart"></canvas>
     </div>
 
-    <div id="toggleLog" onclick="toggleLog()">🔽 Mostra Registro</div>
+    <div id="toggleLog" onclick="toggleLog()">🔽 Show Log</div>
 
     <div id="logContainer" style="display:none;">
-      <h3>Registro sessione:</h3>
+      <h3>Session Log</h3>
       <ul id="logList"></ul>
     </div>
 
@@ -220,8 +232,8 @@
 
   <div id="popupModal" class="modal">
     <div class="modal-content">
-      <img src="https://your-github-site.github.io/winner1.png" alt="Vittoria!" />
-      <button class="close-btn" onclick="closeModal()">Chiudi</button>
+      <img src="winner1.png" alt="Winner" />
+      <button class="close-btn" onclick="closeModal()">Close</button>
     </div>
   </div>
 
@@ -236,8 +248,6 @@
     const touchCountDisplay = document.getElementById('touchCount');
     const toGoDisplay = document.getElementById('toGo');
     const congratsMessage = document.getElementById('congratsMessage');
-    const body = document.body;
-    const clock = document.getElementById('clock');
     const repInput = document.getElementById('repInput');
     const logContainer = document.getElementById('logContainer');
     const logList = document.getElementById('logList');
@@ -245,6 +255,7 @@
     const chartCanvas = document.getElementById('progressChart');
     const toggleLogBtn = document.getElementById('toggleLog');
     const popupModal = document.getElementById('popupModal');
+    const clock = document.getElementById('clock');
 
     let touchCount = 0;
     let startTime = 0;
@@ -269,7 +280,7 @@
         const seconds = Math.floor((Date.now() - startTime) / 1000);
         secondsDisplay.textContent = seconds;
         if (seconds >= 10) {
-          body.style.backgroundColor = '#6aa84f';
+          document.body.style.backgroundColor = '#6aa84f';
         }
       }, 200);
     }
@@ -311,7 +322,7 @@
         const relaxTime = Math.floor((Date.now() - postStartTime) / 1000);
         postSecondsDisplay.textContent = relaxTime;
         if (relaxTime >= 5 && touchCount < goal) {
-          body.style.backgroundColor = '#e74c3c';
+          document.body.style.backgroundColor = '#e74c3c';
         }
       }, 200);
     }
@@ -330,7 +341,7 @@
       touchCountDisplay.textContent = "0";
       toGoDisplay.textContent = `- ${repInput.value}`;
       congratsMessage.style.display = 'none';
-      body.style.backgroundColor = '#0A0A0A';
+      document.body.style.backgroundColor = '#0A0A0A';
       logList.innerHTML = '';
       logContainer.style.display = 'none';
       toggleLogBtn.style.display = 'none';
@@ -343,13 +354,13 @@
     function handlePressStart(e) {
       e.preventDefault();
       if (!started) started = true;
-      body.style.backgroundColor = '#190F2E';
+      document.body.style.backgroundColor = '#190F2E';
       startCount();
     }
 
     function handlePressEnd(e) {
       e.preventDefault();
-      body.style.backgroundColor = '#0A0A0A';
+      document.body.style.backgroundColor = '#0A0A0A';
       stopCount();
     }
 
@@ -365,14 +376,14 @@
           labels,
           datasets: [
             {
-              label: 'Contrazione (s)',
+              label: 'Hold (s)',
               data: contractions,
               borderColor: 'green',
               borderWidth: 2,
               fill: false
             },
             {
-              label: 'Rilassamento (s)',
+              label: 'Rest (s)',
               data: relaxations,
               borderColor: 'red',
               borderWidth: 2,
@@ -396,13 +407,13 @@
     function toggleLog() {
       logVisible = !logVisible;
       logContainer.style.display = logVisible ? 'block' : 'none';
-      toggleLogBtn.textContent = logVisible ? '🔼 Nascondi Registro' : '🔽 Mostra Registro';
+      toggleLogBtn.textContent = logVisible ? '🔼 Hide Log' : '🔽 Show Log';
 
       if (logVisible) {
         logList.innerHTML = '';
         sessionLog.forEach(entry => {
           const li = document.createElement('li');
-          li.textContent = `Rep ${entry.rep}: Contrazione ${entry.contraction}s, Rilassamento ${entry.relaxation}s`;
+          li.textContent = `Rep ${entry.rep}: Hold ${entry.contraction}s, Rest ${entry.relaxation}s`;
           logList.appendChild(li);
         });
       }
@@ -415,18 +426,6 @@
     function closeModal() {
       popupModal.style.display = "none";
     }
-
-    square.addEventListener('mousedown', handlePressStart);
-    square.addEventListener('mouseup', handlePressEnd);
-    square.addEventListener('touchstart', handlePressStart);
-    square.addEventListener('touchend', handlePressEnd);
-
-    repInput.addEventListener('change', () => {
-      const val = parseInt(repInput.value);
-      if (!isNaN(val) && val > 0) {
-        toGoDisplay.textContent = `- ${val - touchCount}`;
-      }
-    });
 
     function updateClock() {
       const now = new Date();
@@ -442,6 +441,11 @@
     setInterval(updateClock, 1000);
     updateClock();
     toGoDisplay.textContent = `- ${repInput.value}`;
+
+    square.addEventListener('mousedown', handlePressStart);
+    square.addEventListener('mouseup', handlePressEnd);
+    square.addEventListener('touchstart', handlePressStart);
+    square.addEventListener('touchend', handlePressEnd);
   </script>
 
 </body>
