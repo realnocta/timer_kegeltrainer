@@ -10,25 +10,25 @@
       font-family: sans-serif;
       background-color: #0A0A0A;
       color: #FFFFFF;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      justify-content: flex-start;
-      min-height: 100vh;
       margin: 0;
       padding: 20px;
-      padding-bottom: 80px;
       box-sizing: border-box;
+      display: flex;
+      flex-direction: column;
+      min-height: 100vh;
     }
 
     .container {
       text-align: center;
       width: 100%;
-      max-width: 700px;
+      max-width: 400px;
       display: flex;
       flex-direction: column;
       align-items: center;
-      gap: 30px;
+      justify-content: center;
+      gap: 25px;
+      min-height: 60vh;
+      margin: auto;
     }
 
     h1 {
@@ -72,26 +72,26 @@
 
     .info-row {
       display: flex;
-      flex-wrap: wrap;
       justify-content: center;
-      gap: 40px;
-      font-size: 1.1rem;
+      gap: 20px;
+      font-size: 1rem;
+      flex-wrap: wrap;
     }
 
     .info-total {
-      font-size: 1.2rem;
-      margin-top: 10px;
+      font-size: 1.1rem;
+      margin-top: 5px;
     }
 
     #congratsMessage {
       display: none;
-      font-size: 1.5rem;
+      font-size: 1.4rem;
       color: #FFD700;
       font-weight: bold;
     }
 
     button {
-      padding: 12px 24px;
+      padding: 10px 20px;
       font-size: 1rem;
       border: none;
       border-radius: 8px;
@@ -112,7 +112,7 @@
     #chartContainer, #logContainer {
       width: 100%;
       background-color: #1a1a1a;
-      padding: 20px;
+      padding: 15px;
       border-radius: 10px;
       margin-top: 20px;
     }
@@ -124,7 +124,7 @@
     }
 
     #logContainer li {
-      margin-bottom: 8px;
+      margin-bottom: 6px;
       font-size: 0.95rem;
     }
 
@@ -141,12 +141,10 @@
     }
 
     #footer {
-      position: fixed;
-      bottom: 10px;
-      width: 100%;
       text-align: center;
       color: #aaa;
       font-size: 0.9rem;
+      padding: 10px 0;
     }
 
     .modal {
@@ -203,13 +201,8 @@
     }
 
     @media (max-width: 480px) {
-      h1 {
-        font-size: 1.6rem;
-      }
-
-      .info-row {
-        flex-direction: column;
-        align-items: center;
+      .container {
+        gap: 20px;
       }
 
       #square {
