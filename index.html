@@ -340,14 +340,14 @@ const gifUrls = [
   'https://raw.githubusercontent.com/realnocta/timer_kegeltrainer/main/background2.gif',
   'https://raw.githubusercontent.com/realnocta/timer_kegeltrainer/main/background3.gif',
   'https://raw.githubusercontent.com/realnocta/timer_kegeltrainer/main/background4.gif',
-  'https://raw.githubusercontent.com/realnocta/timer_kegeltrainer/main/background5.gif'
+  'https://raw.githubusercontent.com/realnocta/timer_kegeltrainer/main/background5.gif',
   'https://raw.githubusercontent.com/realnocta/timer_kegeltrainer/main/background6.gif',
   'https://raw.githubusercontent.com/realnocta/timer_kegeltrainer/main/background7.gif',
   'https://raw.githubusercontent.com/realnocta/timer_kegeltrainer/main/background8.gif',
   'https://raw.githubusercontent.com/realnocta/timer_kegeltrainer/main/background9.gif',
   'https://raw.githubusercontent.com/realnocta/timer_kegeltrainer/main/background10.gif',
   'https://raw.githubusercontent.com/realnocta/timer_kegeltrainer/main/background11.gif',
-  'https://raw.githubusercontent.com/realnocta/timer_kegeltrainer/main/background12.gif',
+  'https://raw.githubusercontent.com/realnocta/timer_kegeltrainer/main/background12.gif'
 ];
     let currentGifIndex = 0;
 
@@ -441,7 +441,7 @@ const gifUrls = [
       e.preventDefault();
       if (!started) { started = true; startSessionTimer(); }
 
-      currentGifIndex = (currentGifIndex + 1) % gifUrls.length;
+       currentGifIndex = Math.floor(Math.random() * gifUrls.length);
       backgroundEffect.style.backgroundImage = `url('${gifUrls[currentGifIndex]}')`;
 
       document.body.style.backgroundColor = '#343434';
