@@ -34,11 +34,18 @@
       transition: opacity 0.3s ease;
     }
 
-    #backgroundEffect::before {
-      content: "";
+    #overlay {
       position: absolute;
       inset: 0;
-      background-color: rgba(75, 0, 130, 0.6); /* Viola trasparente */
+      transition: background-color 0.3s ease;
+    }
+
+    .background-dark {
+      background-color: rgba(0, 0, 0, 0.6);
+    }
+
+    .background-green {
+      background-color: rgba(106, 168, 79, 0.6);
     }
 
     .container {
@@ -237,7 +244,9 @@
 </head>
 <body>
 
-  <div id="backgroundEffect"></div>
+  <div id="backgroundEffect">
+    <div id="overlay" class="background-dark"></div>
+  </div>
 
   <div class="container">
     <h1>Kegel Timer Trainer</h1>
@@ -302,6 +311,7 @@
     const popupModal = document.getElementById('popupModal');
     const clock = document.getElementById('clock');
     const backgroundEffect = document.getElementById('backgroundEffect');
+    const overlay = document.getElementById('overlay');
 
     let touchCount = 0;
     let startTime = 0;
@@ -318,7 +328,8 @@
       'https://media2.giphy.com/media/v1.Y2lkPTc5MGI3NjExdzFyenA2dzY1aXI0NjM3ZGJ5bXlmcnZpNmNrMHY5MWFpbW41cmFjMSZlcD12MV9pbnRlcm5hbF9naWZfYnlfaWQmY3Q9Zw/svbEXm7eGdYhEPITfT/giphy.gif',
       'https://media0.giphy.com/media/v1.Y2lkPTc5MGI3NjExcHRlZjZsMTFqb3ZhN21rOW83dms4ZDdrb3N1NTY3aG1nY2IycXluMyZlcD12MV9pbnRlcm5hbF9naWZfYnlfaWQmY3Q9Zw/UhE1jItlh4DHPOX4vk/giphy.gif',
       'https://media2.giphy.com/media/v1.Y2lkPTc5MGI3NjExdzNxNjRtamM2bWk2NngxeHEwNDJja2F6dDdsanV4NnY0ankzeG9taCZlcD12MV9pbnRlcm5hbF9naWZfYnlfaWQmY3Q9Zw/8eAgATN6HZoiifUJyh/giphy.gif',
-      'https://media4.giphy.com/media/jTo1LpDVjZZrCFKXv4/giphy.gif'
+      'https://media4.giphy.com/media/jTo1LpDVjZZrCFKXv4/giphy.gif',
+      'https://s3.gifyu.com/images/yourgif.gif'
     ];
     let currentGifIndex = 0;
 
@@ -330,20 +341,19 @@
       }
       postSecondsDisplay.textContent = "0";
       startTime = Date.now();
+
       timer = setInterval(() => {
         const seconds = Math.floor((Date.now() - startTime) / 1000);
         secondsDisplay.textContent = seconds;
+
         if (seconds >= 10) {
-          document.body.style.backgroundColor = '#6aa84f';
+          overlay.className = 'background-green';
         }
       }, 200);
     }
 
     function stopCount() {
-      if (timer) {
-        clearInterval(timer);
-        timer = null;
-      }
+      if (timer) clearInterval(timer);
 
       const contractionTime = Math.floor((Date.now() - startTime) / 1000);
       secondsDisplay.textContent = contractionTime;
@@ -367,7 +377,6 @@
         showLogToggle();
         showModal();
         clearInterval(postTimer);
-        postTimer = null;
         return;
       }
 
@@ -375,17 +384,12 @@
       postTimer = setInterval(() => {
         const relaxTime = Math.floor((Date.now() - postStartTime) / 1000);
         postSecondsDisplay.textContent = relaxTime;
-        if (relaxTime >= 5 && touchCount < goal) {
-          document.body.style.backgroundColor = '#e74c3c';
-        }
       }, 200);
     }
 
     function resetAll() {
       if (timer) clearInterval(timer);
       if (postTimer) clearInterval(postTimer);
-      timer = null;
-      postTimer = null;
       secondsDisplay.textContent = "0";
       postSecondsDisplay.textContent = "0";
       touchCount = 0;
@@ -395,7 +399,8 @@
       touchCountDisplay.textContent = "0";
       toGoDisplay.textContent = `- ${repInput.value}`;
       congratsMessage.style.display = 'none';
-      document.body.style.backgroundColor = '#0A0A0A';
+      backgroundEffect.style.opacity = '0';
+      overlay.className = 'background-dark';
       logList.innerHTML = '';
       logContainer.style.display = 'none';
       toggleLogBtn.style.display = 'none';
@@ -411,15 +416,13 @@
 
       currentGifIndex = (currentGifIndex + 1) % gifUrls.length;
       backgroundEffect.style.backgroundImage = `url('${gifUrls[currentGifIndex]}')`;
-
-      document.body.style.backgroundColor = '#190F2E';
+      overlay.className = 'background-dark';
       backgroundEffect.style.opacity = '1';
       startCount();
     }
 
     function handlePressEnd(e) {
       e.preventDefault();
-      document.body.style.backgroundColor = '#0A0A0A';
       backgroundEffect.style.opacity = '0';
       stopCount();
     }
