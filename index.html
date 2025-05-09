@@ -32,20 +32,7 @@
       opacity: 0;
       pointer-events: none;
       transition: opacity 0.3s ease;
-    }
-
-    #overlay {
-      position: absolute;
-      inset: 0;
-      transition: background-color 0.3s ease;
-    }
-
-    .background-dark {
-      background-color: rgba(0, 0, 0, 0.6);
-    }
-
-    .background-green {
-      background-color: rgba(106, 168, 79, 0.6);
+      mix-blend-mode: overlay;
     }
 
     .container {
@@ -244,9 +231,7 @@
 </head>
 <body>
 
-  <div id="backgroundEffect">
-    <div id="overlay" class="background-dark"></div>
-  </div>
+  <div id="backgroundEffect"></div>
 
   <div class="container">
     <h1>Kegel Timer Trainer</h1>
@@ -266,6 +251,10 @@
     <div class="info-total">
       Completed: <span id="touchCount">0</span> &nbsp;&nbsp;&nbsp; Remaining: <span id="toGo">- 25</span>
     </div>
+    <div class="info-total">
+      Total Session Time: <span id="sessionTimer">0</span>
+    </div>
+
 
     <div id="congratsMessage">Congratulations! 🎉</div>
 
@@ -287,6 +276,7 @@
     <div class="modal-content">
       <img id="winnerImage" src="winner1.png" alt="Winner" />
       <p style="font-size: 24px; color: #FFD700; font-weight: bold; margin-top: 15px;">Congratulations! 🎉</p>
+      <p id="timeMessage" style="font-size: 20px; color: #FFD700; font-weight: bold;"></p>
       <button class="close-btn" onclick="closeModal()">Close</button>
     </div>
   </div>
@@ -311,7 +301,6 @@
     const popupModal = document.getElementById('popupModal');
     const clock = document.getElementById('clock');
     const backgroundEffect = document.getElementById('backgroundEffect');
-    const overlay = document.getElementById('overlay');
 
     let touchCount = 0;
     let startTime = 0;
@@ -322,14 +311,35 @@
     let sessionLog = [];
     let currentRelaxation = 0;
     let chart;
+const sessionTimerDisplay = document.getElementById('sessionTimer');
+let sessionStartTime = 0;
+let sessionTimerInterval = null;
+
+function formatTime(seconds) {
+  const mins = Math.floor(seconds / 60);
+  const secs = seconds % 60;
+  return `${mins}m ${secs}s`;
+}
+
+function startSessionTimer() {
+  sessionStartTime = Date.now();
+  sessionTimerInterval = setInterval(() => {
+    const totalTime = Math.floor((Date.now() - sessionStartTime) / 1000);
+    sessionTimerDisplay.textContent = formatTime(totalTime);
+  }, 1000);
+}
+
+function stopSessionTimer() {
+  clearInterval(sessionTimerInterval);
+}
+
     let logVisible = false;
 
     const gifUrls = [
       'https://media2.giphy.com/media/v1.Y2lkPTc5MGI3NjExdzFyenA2dzY1aXI0NjM3ZGJ5bXlmcnZpNmNrMHY5MWFpbW41cmFjMSZlcD12MV9pbnRlcm5hbF9naWZfYnlfaWQmY3Q9Zw/svbEXm7eGdYhEPITfT/giphy.gif',
       'https://media0.giphy.com/media/v1.Y2lkPTc5MGI3NjExcHRlZjZsMTFqb3ZhN21rOW83dms4ZDdrb3N1NTY3aG1nY2IycXluMyZlcD12MV9pbnRlcm5hbF9naWZfYnlfaWQmY3Q9Zw/UhE1jItlh4DHPOX4vk/giphy.gif',
       'https://media2.giphy.com/media/v1.Y2lkPTc5MGI3NjExdzNxNjRtamM2bWk2NngxeHEwNDJja2F6dDdsanV4NnY0ankzeG9taCZlcD12MV9pbnRlcm5hbF9naWZfYnlfaWQmY3Q9Zw/8eAgATN6HZoiifUJyh/giphy.gif',
-      'https://media4.giphy.com/media/jTo1LpDVjZZrCFKXv4/giphy.gif',
-      'https://s3.gifyu.com/images/yourgif.gif'
+      'https://media4.giphy.com/media/jTo1LpDVjZZrCFKXv4/giphy.gif'
     ];
     let currentGifIndex = 0;
 
@@ -341,19 +351,21 @@
       }
       postSecondsDisplay.textContent = "0";
       startTime = Date.now();
-
       timer = setInterval(() => {
         const seconds = Math.floor((Date.now() - startTime) / 1000);
         secondsDisplay.textContent = seconds;
-
         if (seconds >= 10) {
-          overlay.className = 'background-green';
+          document.body.style.backgroundColor = '#50C878';
+          backgroundEffect.style.opacity = '1';
         }
       }, 200);
     }
 
     function stopCount() {
-      if (timer) clearInterval(timer);
+      if (timer) {
+        clearInterval(timer);
+        timer = null;
+      }
 
       const contractionTime = Math.floor((Date.now() - startTime) / 1000);
       secondsDisplay.textContent = contractionTime;
@@ -377,6 +389,7 @@
         showLogToggle();
         showModal();
         clearInterval(postTimer);
+        postTimer = null;
         return;
       }
 
@@ -384,12 +397,17 @@
       postTimer = setInterval(() => {
         const relaxTime = Math.floor((Date.now() - postStartTime) / 1000);
         postSecondsDisplay.textContent = relaxTime;
+        if (relaxTime >= 5 && touchCount < goal) {
+          document.body.style.backgroundColor = '#e74c3c';
+        }
       }, 200);
     }
 
     function resetAll() {
       if (timer) clearInterval(timer);
       if (postTimer) clearInterval(postTimer);
+      timer = null;
+      postTimer = null;
       secondsDisplay.textContent = "0";
       postSecondsDisplay.textContent = "0";
       touchCount = 0;
@@ -399,8 +417,7 @@
       touchCountDisplay.textContent = "0";
       toGoDisplay.textContent = `- ${repInput.value}`;
       congratsMessage.style.display = 'none';
-      backgroundEffect.style.opacity = '0';
-      overlay.className = 'background-dark';
+      document.body.style.backgroundColor = '#0A0A0A';
       logList.innerHTML = '';
       logContainer.style.display = 'none';
       toggleLogBtn.style.display = 'none';
@@ -408,21 +425,25 @@
       if (chart) chart.destroy();
       logVisible = false;
       popupModal.style.display = "none";
+  stopSessionTimer();
+  sessionTimerDisplay.textContent = "0";
     }
 
     function handlePressStart(e) {
       e.preventDefault();
-      if (!started) started = true;
+      if (!started) { started = true; startSessionTimer(); }
 
       currentGifIndex = (currentGifIndex + 1) % gifUrls.length;
       backgroundEffect.style.backgroundImage = `url('${gifUrls[currentGifIndex]}')`;
-      overlay.className = 'background-dark';
+
+      document.body.style.backgroundColor = '#343434';
       backgroundEffect.style.opacity = '1';
       startCount();
     }
 
     function handlePressEnd(e) {
       e.preventDefault();
+      document.body.style.backgroundColor = '#0A0A0A';
       backgroundEffect.style.opacity = '0';
       stopCount();
     }
@@ -486,11 +507,16 @@
       const imageOptions = ['winner1.png', 'winner2.png', 'winner3.png', 'winner4.png', 'winner5.png'];
       const randomImage = imageOptions[Math.floor(Math.random() * imageOptions.length)];
       document.getElementById('winnerImage').src = randomImage;
+      stopSessionTimer();
+      const totalTime = Math.floor((Date.now() - sessionStartTime) / 1000);
+      document.getElementById('timeMessage').textContent = `Your time is ${formatTime(totalTime)}`;
       popupModal.style.display = "block";
     }
 
     function closeModal() {
       popupModal.style.display = "none";
+  stopSessionTimer();
+  sessionTimerDisplay.textContent = "0";
     }
 
     function updateClock() {
